@@ -15,11 +15,13 @@ Simple ARM64 KM Driver for Windows with CMake
 `clang -c -S -emit-llvm -target arm64-pc-windows-msvc -D_ARM64_ -D"ARM64_PREVENT_REGISTER_WRITEBACK"=1  -DNT_KERNEL_MODE -D__ARM64__ -D__aarch64__ -DCLANG_DISABLE_MACRO_WARNINGS   -I"C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/km" -I"C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared" -I"C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/km/crt" -I"C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um/"   -I"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\km\arm64" driver.c -o driver.ll`  
 2. If you get errors related to macro expanding in files like wdm.h, you need to patch over this manually in wdm.h:
 
-`//#define ARM64_PREVENT_REGISTER_WRITEBACK(_type, _variable) \
+```
+//#define ARM64_PREVENT_REGISTER_WRITEBACK(_type, _variable) \
 //    _variable = (volatile _type *)ReadPointerNoFence((PVOID const volatile *)&##_variable);
 
 #define ARM64_PREVENT_REGISTER_WRITEBACK(_type, _variable) \
-    _variable = (volatile _type *)ReadPointerNoFence((PVOID const volatile *)&(_variable));`
+    _variable = (volatile _type *)ReadPointerNoFence((PVOID const volatile *)&(_variable));
+```
 
 3. Once you have your .ll, run an LLVM pass on it with: `opt -load-pass-plugin="MyPass.dll" -passes='opaque' driver.ll -S -o driver_out.ll` (you may need to take away the 'optnone' attribute in the .ll file for any functions holding attribute tags (like #0))  
 
