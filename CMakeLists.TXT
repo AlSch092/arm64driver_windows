@@ -1,0 +1,44 @@
+cmake_minimum_required(VERSION 3.13)
+
+# Set the project name
+project(HelloWorldDriver)
+
+set(DRIVER_VERSION "1.0.0.0")
+set(DRIVER_DATE "04/27/2025")
+set(VID "VendorMe")  # Replace with your Vendor ID
+set(PID "ProductOne")  # Replace with your Product ID
+
+set(INF_TEMPLATE "${CMAKE_SOURCE_DIR}/driver.inf.in")
+set(INF_OUTPUT "${CMAKE_BINARY_DIR}/driver.inf")
+
+# Automatically generate the INF file using configure_file()
+configure_file(${INF_TEMPLATE} ${INF_OUTPUT} @ONLY)
+
+# Set up WDK paths
+set(WDK_DIR "C:/Program Files (x86)/Windows Kits/10")
+
+# Include WDK headers
+include_directories(
+    ${WDK_DIR}/Include/10.0.26100.0/km
+    ${WDK_DIR}/Include/10.0.26100.0/shared
+)
+
+add_definitions(-D_ARM64_)
+
+# Link with WDK libraries for ARM64
+link_directories(${WDK_DIR}/Lib/10.0.26100.0/km/arm64)
+
+# Add your driver source
+add_library(HelloWorldDriver STATIC driver.c)
+
+# Link against kernel libraries
+target_link_libraries(HelloWorldDriver
+    ntoskrnl.lib
+)
+
+# Set target properties for driver
+set_target_properties(HelloWorldDriver PROPERTIES
+    OUTPUT_NAME "HelloWorldDriver"
+    SUFFIX ".sys"
+    LINK_FLAGS "/SUBSYSTEM:NATIVE /INCREMENTAL:NO /OPT:REF /OPT:ICF"
+)

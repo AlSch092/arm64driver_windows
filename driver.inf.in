@@ -1,0 +1,43 @@
+[Version]
+Signature="$Windows NT$"
+Class=System
+ClassGuid={4d36e97d-e325-11ce-bfc1-08002be10318}
+Provider=%ManufacturerName%
+DriverVer=${DRIVER_DATE},${DRIVER_VERSION}
+CatalogFile=driver.cat  ; Optional: if you have a catalog file
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTx86,NTamd64,ARM64
+
+[Standard.NTx86]
+%DeviceName%=DriverInstall,USB\VID_${VID}&PID_${PID}
+
+[Standard.NTamd64]
+%DeviceName%=DriverInstall,USB\VID_${VID}&PID_${PID}
+
+[Standard.ARM64]
+%DeviceName%=DriverInstall,USB\VID_${VID}&PID_${PID}
+
+[DriverInstall]
+CopyFiles=DriverFiles
+AddReg=DriverAddReg
+
+[DriverAddReg]
+; You can add registry settings here if needed.
+
+[DriverFiles]
+driver.sys
+
+[SourceDisksNames]
+1 = %DiskName%,,,
+
+[SourceDisksFiles]
+driver.sys = 1
+
+[DestinationDirs]
+DefaultDestDir = 12  ; System32\drivers
+
+[Strings]
+ManufacturerName="Your Company Name"
+DeviceName="Your Device Name"
+DiskName="Your Driver Disk"
